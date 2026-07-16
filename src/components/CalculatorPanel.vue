@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue'
+import { useMemoryStore } from '../stores/memoryStore'
 
 const displayValue = ref('0')
 const firstNumber = ref(null)
 const selectedOperator = ref(null)
 const shouldResetDisplay = ref(false)
+
+const memoryStore = useMemoryStore()
 
 function pressDigit(digit) {
     if (displayValue.value === 'Error') {
@@ -85,6 +88,27 @@ function calculateResult() {
     selectedOperator.value = null
     shouldResetDisplay.value = true
 }
+
+function saveToMemory() {
+  if (displayValue.value === 'Error') {
+    return
+  }
+
+  memoryStore.saveMemory(displayValue.value)
+}
+
+function readMemory() {
+  if (memoryStore.memoryValue === null) {
+    return
+  }
+
+  displayValue.value = memoryStore.memoryValue
+  shouldResetDisplay.value = true
+}
+
+function clearMemory() {
+  memoryStore.clearMemory()
+}
 </script>
 
 <template>
@@ -97,9 +121,9 @@ function calculateResult() {
 
         <div class="calculator-grid">
             <button class="memory-button" type="button" @click="clearCalculator">CE</button>
-            <button class="memory-button" type="button">M+</button>
-            <button class="memory-button" type="button">MR</button>
-            <button class="memory-button" type="button">MC</button>
+            <button class="memory-button" type="button" @click="saveToMemory">M+</button>
+            <button class="memory-button" type="button" @click="readMemory">MR</button>
+            <button class="memory-button" type="button" @click="clearMemory">MC</button>
 
             <button type="button" @click="pressDigit('7')">7</button>
             <button type="button" @click="pressDigit('8')">8</button>
