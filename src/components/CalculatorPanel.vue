@@ -2,8 +2,22 @@
 import { ref } from 'vue'
 
 const displayValue = ref('0')
+const firstNumber = ref(null)
+const selectedOperator = ref(null)
+const shouldResetDisplay = ref(false)
 
 function pressDigit(digit) {
+    if (displayValue.value === 'Error') {
+        displayValue.value = digit
+        return
+    }
+
+    if (shouldResetDisplay.value) {
+        displayValue.value = digit
+        shouldResetDisplay.value = false
+        return
+    }
+
     if (displayValue.value.length >= 12) {
         return
     }
@@ -17,12 +31,59 @@ function pressDigit(digit) {
 
 function clearCalculator() {
     displayValue.value = '0'
+    firstNumber.value = null
+    selectedOperator.value = null
+    shouldResetDisplay.value = false
 }
 
 function pressDecimal() {
     if (!displayValue.value.includes('.')) {
         displayValue.value +='.'
     }
+}
+
+function chooseOperator(operator) {
+    firstNumber.value = Number(displayValue.value)
+    selectedOperator.value = operator
+    shouldResetDisplay.value = true
+}
+
+function calculateResult() {
+    if (firstNumber.value === null || selectedOperator.value === null) {
+        return
+    }
+
+    const secondNumber = Number(displayValue.value)
+    let result = 0
+
+    if (selectedOperator.value === '+') {
+        result = firstNumber.value + secondNumber
+    }
+
+     if (selectedOperator.value === '-') {
+        result = firstNumber.value - secondNumber
+    }
+
+    if (selectedOperator.value === '*') {
+        result = firstNumber.value * secondNumber
+    }
+
+    if (selectedOperator.value === '/') {
+        if (secondNumber === 0) {
+            displayValue.value = 'Error'
+            firstNumber.value = null
+            selectedOperator.value = null
+            shouldResetDisplay.value = true
+            return
+        }
+
+        result = firstNumber.value / secondNumber
+    }
+
+    displayValue.value = String(result)
+    firstNumber.value = null
+    selectedOperator.value = null
+    shouldResetDisplay.value = true
 }
 </script>
 
@@ -43,22 +104,22 @@ function pressDecimal() {
             <button type="button" @click="pressDigit('7')">7</button>
             <button type="button" @click="pressDigit('8')">8</button>
             <button type="button" @click="pressDigit('9')">9</button>
-            <button class="operator-button" type="button">÷</button>
+            <button class="operator-button" type="button" @click="chooseOperator('/')">÷</button>
 
             <button type="button" @click="pressDigit('4')">4</button>
             <button type="button" @click="pressDigit('5')">5</button>
             <button type="button" @click="pressDigit('6')">6</button>
-            <button class="operator-button" type="button">×</button>
+            <button class="operator-button" type="button" @click="chooseOperator('*')">×</button>
 
             <button type="button" @click="pressDigit('1')">1</button>
             <button type="button" @click="pressDigit('2')">2</button>
             <button type="button" @click="pressDigit('3')">3</button>
-            <button class="operator-button" type="button">−</button>
+            <button class="operator-button" type="button" @click="chooseOperator('-')">−</button>
 
             <button type="button" @click="pressDigit('0')">0</button>
             <button type="button" @click="pressDecimal">.</button>
-            <button class="operator-button" type="button">=</button>
-            <button class="operator-button" type="button">+</button>
+            <button class="operator-button" type="button" @click="calculateResult">=</button>
+            <button class="operator-button" type="button" @click="chooseOperator('+')">+</button>
         </div>
     </section>
 
