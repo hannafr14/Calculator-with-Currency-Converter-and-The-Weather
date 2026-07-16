@@ -174,6 +174,17 @@ button {
     font-weight: 600;
     font-size: 18px;
     border-radius: 10px;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+  filter: brightness(0.88);
+  box-shadow: inset 0 3px 8px rgba(30, 41, 59, 0.22);
+}
+
+button:hover {
+  filter: brightness(0.98);
 }
 
 .memory-button {
@@ -183,10 +194,20 @@ button {
     font-weight: 700;
 }
 
+.memory-button:active {
+  filter: brightness(0.9);
+  box-shadow: inset 0 3px 8px rgba(99, 102, 241, 0.28);
+}
+
 .operator-button {
     background: var(--color-primary);
     color: var(--color-white);
     font-size: 21px;
   }
+
+.operator-button:active {
+  filter: brightness(0.78);
+  box-shadow: inset 0 3px 10px rgba(30, 41, 59, 0.32);
+}
 
 </style>
