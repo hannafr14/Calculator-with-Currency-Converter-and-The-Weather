@@ -40,8 +40,19 @@ function clearCalculator() {
 }
 
 function pressDecimal() {
+    if (shouldResetDisplay.value) {
+        displayValue.value = '0.'
+        shouldResetDisplay.value = false
+        return
+    }
+
+    if (displayValue.value === 'Error') {
+        displayValue.value = '0.'
+        return
+    }
+
     if (!displayValue.value.includes('.')) {
-        displayValue.value +='.'
+        displayValue.value += '.'
     }
 }
 
@@ -94,7 +105,8 @@ function saveToMemory() {
     return
   }
 
-  memoryStore.saveMemory(displayValue.value)
+  memoryStore.addMemory(displayValue.value)
+  shouldResetDisplay.value = true
 }
 
 function readMemory() {

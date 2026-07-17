@@ -4,17 +4,20 @@ import { ref } from 'vue'
 export const useMemoryStore = defineStore('memory', () => {
     const memoryValue = ref(null)
 
-    function saveMemory(value) {
-        memoryValue.value = value
+    function addMemory(value) {
+        const currentMemory = Number(memoryValue.value || 0)
+        const currentValue = Number(value)
+
+        memoryValue.value = String(currentMemory + currentValue)
     }
 
-    function clearMemory(){
+    function clearMemory() {
         memoryValue.value = null
     }
 
     return {
     memoryValue,
-    saveMemory,
+    addMemory,
     clearMemory,
   }
 })
