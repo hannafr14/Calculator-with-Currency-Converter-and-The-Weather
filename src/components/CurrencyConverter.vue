@@ -1,4 +1,40 @@
 <script setup>
+import { ref } from 'vue'
+import { handleCurrencyConversion } from '../controllers/currencyController'
+
+const amount = ref(1)
+const fromCurrency = ref('EUR')
+const toCurrency = ref('USD')
+const result = ref(null)
+const resultCurrency = ref('')
+const rateText = ref('')
+const updatedAt = ref('')
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+async function convertCurrency() {
+    errorMessage.value = ''
+    result.value = null
+
+    isLoading.value = true
+
+  try {
+    const conversion = await handleCurrencyConversion(
+      amount.value,
+      fromCurrency.value,
+      toCurrency.value
+    )
+
+    result.value = conversion.result
+    resultCurrency.value = toCurrency.value
+    rateText.value = conversion.rateText
+    updatedAt.value = conversion.updatedAt
+  } catch (error) {
+    errorMessage.value = error.message || 'No se pudo obtener el cambio'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -8,28 +44,28 @@
         <div class="currency-form">
             <label class="form-field">
                 <span>Cantidad</span>
-                <input type="number" value="100">
+                <input type="number" v-model="amount" min="0" step="1">
             </label>
 
             <label class="form-field">
                 <span>De</span>
-                <select>
-                    <option>EUR (€)</option>
-                    <option>USD ($)</option>
-                    <option>JPY (¥)</option>
+                <select v-model="fromCurrency">
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="JPY">JPY (¥)</option>
                 </select>
             </label>
 
             <label class="form-field">
                 <span>A</span>
-                <select>
-                    <option>USD ($)</option>
-                    <option>EUR (€)</option>
-                    <option>JPY (¥)</option>
+                <select v-model="toCurrency">
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="JPY">JPY (¥)</option>
                 </select>
             </label>
 
-            <button class="convert-button" type="button">
+            <button class="convert-button" type="button" @click="convertCurrency">
                 Convertir
             </button>
         </div>
@@ -37,14 +73,20 @@
         <div class="currency-result">
             <div>
                 <span>Resultado:</span>
-                <strong>108.47 USD</strong>
+                <strong v-if="result">{{ result }} {{ resultCurrency }}</strong>
+                <strong v-else>--</strong>
             </div>
 
             <div class="currency-rate">
-                <span>1 EUR = 1.0847 USD</span>
-                <small>Actualizado: 20/05/2025 12:30</small>
+                <span v-if="rateText">{{ rateText }}</span>
+                <span v-else>Selecciona divisas</span>
+                <small v-if="updatedAt">Actualizado: {{ updatedAt }}</small>
             </div>
         </div>
+
+        <p v-if="errorMessage" class="currency-error">
+            {{ errorMessage }}
+        </p>
     </section>
 </template>
 
@@ -151,6 +193,12 @@
             color: var(--color-muted);
         }
     }
+}
+
+.currency-error {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--color-danger);
 }
 
 @media (min-width: 640px) {
