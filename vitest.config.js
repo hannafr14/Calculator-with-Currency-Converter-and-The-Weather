@@ -9,6 +9,13 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
+      coverage: {
+        exclude: [
+        'e2e/**',
+        'src/assets/**',
+        'src/main.js',
+        ],
+      },
     },
   }),
 )
